@@ -1,0 +1,27 @@
+﻿<Window x:Class="WpfApplication2.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApplication2"
+        mc:Ignorable="d"
+        Title="Typing Game" Height="350" Width="525">
+    <Grid>
+        <TextBox x:Name="TimeRemaining" HorizontalAlignment="Left" Height="21" Margin="341,15,0,0" TextWrapping="Wrap" Text="Time Remaining: " VerticalAlignment="Top" Width="144" BorderThickness="0"/>
+        <TextBox x:Name="TimeCounter" HorizontalAlignment="Left" Height="21" Margin="435,15,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="75" BorderThickness="0"/>
+        <TextBlock x:Name="HealthBlock" HorizontalAlignment="Left" Height="21" Margin="41,15,0,0" TextWrapping="Wrap" Text="Health:" VerticalAlignment="Top" Width="59"/>
+        <Rectangle Fill="Black" HorizontalAlignment="Left" Height="2" Margin="0,41,0,0" Stroke="Black" VerticalAlignment="Top" Width="520" StrokeThickness="10"/>
+        <TextBlock x:Name="ScoreBlock" HorizontalAlignment="Left" Height="21" Margin="196,15,0,0" TextWrapping="Wrap" Text="Score:" VerticalAlignment="Top" Width="59"/>
+        <Image x:Name="image" Source="HH.png" HorizontalAlignment="Left" Height="260" Margin="0,43,0,0" VerticalAlignment="Top" Width="520"/>
+        <TextBox x:Name="TypeBox" HorizontalAlignment="Left" Height="43" Margin="0,280,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="520" BorderThickness="2" Background="White" BorderBrush="#FF2E50B8" TextAlignment="Center" FontSize="24" TextChanged="TypeBox_TextChanged"/>
+        <TextBox x:Name="ScoreCounter" HorizontalAlignment="Left" Height="21" Margin="234,15,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="75" BorderThickness="0" Text="0"/>
+        <Grid x:Name="TextBlockArea" HorizontalAlignment="Left" Height="214" Margin="0,43,0,0" VerticalAlignment="Top" Width="520"/>
+        <Grid x:Name="LifeGrid" HorizontalAlignment="Left" Height="21" Margin="83,14,0,0" VerticalAlignment="Top" Width="73">
+            <Image x:Name="Life1" Source="Heart1.png" HorizontalAlignment="Left" Height="21" VerticalAlignment="Top" Width="21" RenderTransformOrigin="0.339,0.393"/>
+            <Image x:Name="Life2" Source="Heart1.png" HorizontalAlignment="Left" Height="21" Margin="26,0,0,0" VerticalAlignment="Top" Width="21"/>
+            <Image x:Name="Life3" Source="Heart1.png" HorizontalAlignment="Left" Height="21" Margin="52,0,0,0" VerticalAlignment="Top" Width="21" RenderTransformOrigin="2.744,0.393"/>
+        </Grid>
+        <Button x:Name="StartButton" Content="Start" HorizontalAlignment="Left" Height="49" Margin="199,224,0,0" VerticalAlignment="Top" Width="110" Click="StartButton_Click" FontSize="22" FontWeight="Bold" FontStyle="Italic" Background="{x:Null}" BorderThickness="0"/>
+        
+    </Grid>
+</Window>
