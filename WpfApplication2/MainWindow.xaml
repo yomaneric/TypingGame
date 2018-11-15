@@ -6,22 +6,42 @@
         xmlns:local="clr-namespace:WpfApplication2"
         mc:Ignorable="d"
         Title="Typing Game" Height="350" Width="525">
-    <Grid>
-        <TextBox x:Name="TimeRemaining" HorizontalAlignment="Left" Height="21" Margin="341,15,0,0" TextWrapping="Wrap" Text="Time Remaining: " VerticalAlignment="Top" Width="144" BorderThickness="0"/>
-        <TextBox x:Name="TimeCounter" HorizontalAlignment="Left" Height="21" Margin="435,15,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="75" BorderThickness="0"/>
-        <TextBlock x:Name="HealthBlock" HorizontalAlignment="Left" Height="21" Margin="41,15,0,0" TextWrapping="Wrap" Text="Health:" VerticalAlignment="Top" Width="59"/>
-        <Rectangle Fill="Black" HorizontalAlignment="Left" Height="2" Margin="0,41,0,0" Stroke="Black" VerticalAlignment="Top" Width="520" StrokeThickness="10"/>
-        <TextBlock x:Name="ScoreBlock" HorizontalAlignment="Left" Height="21" Margin="196,15,0,0" TextWrapping="Wrap" Text="Score:" VerticalAlignment="Top" Width="59"/>
-        <Image x:Name="image" Source="HH.png" HorizontalAlignment="Left" Height="260" Margin="0,43,0,0" VerticalAlignment="Top" Width="520"/>
-        <TextBox x:Name="TypeBox" HorizontalAlignment="Left" Height="43" Margin="0,280,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="520" BorderThickness="2" Background="White" BorderBrush="#FF2E50B8" TextAlignment="Center" FontSize="24" TextChanged="TypeBox_TextChanged"/>
-        <TextBox x:Name="ScoreCounter" HorizontalAlignment="Left" Height="21" Margin="234,15,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="75" BorderThickness="0" Text="0"/>
-        <Grid x:Name="TextBlockArea" HorizontalAlignment="Left" Height="214" Margin="0,43,0,0" VerticalAlignment="Top" Width="520"/>
-        <Grid x:Name="LifeGrid" HorizontalAlignment="Left" Height="21" Margin="83,14,0,0" VerticalAlignment="Top" Width="73">
-            <Image x:Name="Life1" Source="Heart1.png" HorizontalAlignment="Left" Height="21" VerticalAlignment="Top" Width="21" RenderTransformOrigin="0.339,0.393"/>
-            <Image x:Name="Life2" Source="Heart1.png" HorizontalAlignment="Left" Height="21" Margin="26,0,0,0" VerticalAlignment="Top" Width="21"/>
-            <Image x:Name="Life3" Source="Heart1.png" HorizontalAlignment="Left" Height="21" Margin="52,0,0,0" VerticalAlignment="Top" Width="21" RenderTransformOrigin="2.744,0.393"/>
+    <Window.Background>
+        <ImageBrush ImageSource="p05xh5dx.jpg" Opacity="0.8" Stretch="UniformToFill"/>
+    </Window.Background>
+    <Viewbox Stretch="Fill">
+        <Grid>
+            <Label x:Name="label" HorizontalAlignment="Left" Height="37" Margin="0,1,0,0" VerticalAlignment="Top" Width="520" Background="Black"/>
+            <TextBlock x:Name="TimeRemaining" HorizontalAlignment="Left" Height="21" Margin="341,15,0,0" TextWrapping="Wrap" Text="Time Remaining: " VerticalAlignment="Top" Width="144" Foreground="White"/>
+            <TextBlock x:Name="TimeCounter" HorizontalAlignment="Left" Height="21" Margin="435,15,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="75" Foreground="White" Background="Black"/>
+            <TextBlock x:Name="HealthBlock" HorizontalAlignment="Left" Height="21" Margin="41,15,0,0" TextWrapping="Wrap" Text="Health:" VerticalAlignment="Top" Width="59" Foreground="White"/>
+            <TextBlock x:Name="ScoreBlock" HorizontalAlignment="Left" Height="21" Margin="196,15,0,0" TextWrapping="Wrap" Text="Score:" VerticalAlignment="Top" Width="59" Foreground="White"/>
+            <TextBox x:Name="TypeBox" HorizontalAlignment="Left" Height="43" Margin="0,280,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="520" BorderThickness=".01" Background="Black" TextAlignment="Center" FontSize="24" TextChanged="TypeBox_TextChanged" Foreground="White">
+                <TextBox.SelectionBrush>
+                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                        <GradientStop Color="Black" Offset="1"/>
+                        <GradientStop Color="#FF342F79"/>
+                    </LinearGradientBrush>
+                </TextBox.SelectionBrush>
+                <TextBox.BorderBrush>
+                    <LinearGradientBrush EndPoint="0.5,1" MappingMode="RelativeToBoundingBox" StartPoint="0.5,0">
+                        <GradientStop Color="#FF454370" Offset="0.016"/>
+                        <GradientStop Color="#FF0D0B30" Offset="0.096"/>
+                    </LinearGradientBrush>
+                </TextBox.BorderBrush>
+            </TextBox>
+            <TextBlock x:Name="ScoreCounter" HorizontalAlignment="Left" Height="21" Margin="234,15,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="75" Text="0" Background="Black" Foreground="White"/>
+            <Grid x:Name="TextBlockArea" HorizontalAlignment="Left" Height="237" Margin="0,43,0,0" VerticalAlignment="Top" Width="520"/>
+            <Grid x:Name="LifeGrid" HorizontalAlignment="Left" Height="21" Margin="83,14,0,0" VerticalAlignment="Top" Width="73">
+                <Image x:Name="Life1" Source="Heart1.png" HorizontalAlignment="Left" Height="21" VerticalAlignment="Top" Width="21" RenderTransformOrigin="0.339,0.393"/>
+                <Image x:Name="Life2" Source="Heart1.png" HorizontalAlignment="Left" Height="21" Margin="26,0,0,0" VerticalAlignment="Top" Width="21"/>
+                <Image x:Name="Life3" Source="Heart1.png" HorizontalAlignment="Left" Height="21" Margin="52,0,0,0" VerticalAlignment="Top" Width="21" RenderTransformOrigin="2.744,0.393"/>
+                <TextBlock x:Name="Dead" HorizontalAlignment="Left" Margin="5,2,0,-1" TextWrapping="Wrap" Width="68" RenderTransformOrigin="-0.594,0.48"/>
+            </Grid>
+            <Button x:Name="StartButton" Content="Start" HorizontalAlignment="Left" Height="49" Margin="196,149,0,0" VerticalAlignment="Top" Width="110" Click="StartButton_Click" FontSize="22" FontWeight="Bold" FontStyle="Italic" Background="{x:Null}" BorderThickness="0" Foreground="#FFF9F9F9"/>
+            <Canvas Name="Canvas2D" HorizontalAlignment="Left" Height="237" Margin="0,43,0,0" VerticalAlignment="Top" Width="520"/>
+            <Rectangle Fill="#FF005DFF" HorizontalAlignment="Left" Height="1" Margin="0,280,0,0" Stroke="#FF005DFF" StrokeThickness="10" VerticalAlignment="Top" Width="520"/>
+            <Button x:Name="NextLevel" Content="Next Level" HorizontalAlignment="Left" Height="49" Margin="196,83,0,0" VerticalAlignment="Top" Width="110" FontSize="22" FontWeight="Bold" FontStyle="Italic" Background="{x:Null}" BorderThickness="0" Foreground="#FFF9F9F9" Click="NextLevel_Click"/>
         </Grid>
-        <Button x:Name="StartButton" Content="Start" HorizontalAlignment="Left" Height="49" Margin="199,224,0,0" VerticalAlignment="Top" Width="110" Click="StartButton_Click" FontSize="22" FontWeight="Bold" FontStyle="Italic" Background="{x:Null}" BorderThickness="0"/>
-        
-    </Grid>
+    </Viewbox>
 </Window>

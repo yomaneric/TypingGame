@@ -55,6 +55,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Game.cs" />
+    <Compile Include="Star.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -99,7 +101,10 @@
     <Resource Include="Heart1.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="HH.png" />
+    <Resource Include="sky-clouds-moon-horizon.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="p05xh5dx.jpg" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

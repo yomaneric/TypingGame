@@ -1,17 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace WpfApplication2
 {
@@ -20,149 +11,206 @@ namespace WpfApplication2
     /// </summary>
     public partial class MainWindow : Window
     {
-        System.Windows.Threading.DispatcherTimer dispatcherTimer = new System.Windows.Threading.DispatcherTimer();
-        System.Windows.Threading.DispatcherTimer gameTimer = new System.Windows.Threading.DispatcherTimer();
-        int TimeLeft, GameTime, score, LowerCounter, HigherCounter, LivesCount;
-        const int NoOfBlock = 7, y_height = 10, x1_height = 10, x2_height = 434, die_height = 220, lives = 3;
-        TextBlock[] words = new TextBlock[NoOfBlock];
-        Image[] Lives = new Image[lives];
-        int[] x_axis = new int[NoOfBlock];
-        int[] y_axis = new int[NoOfBlock];
-        List<string> wordList = new List<string>(100) { "Apple", "Orange", "Banana", "One", "Two", "Three", "Eric" };
-
-
+        System.Windows.Threading.DispatcherTimer dispatcherTimer = new System.Windows.Threading.DispatcherTimer(); //Timer for Time left
+        System.Windows.Threading.DispatcherTimer gameTimer = new System.Windows.Threading.DispatcherTimer(); //Timer for falling words
+        System.Windows.Threading.DispatcherTimer bkgrdTimer = new System.Windows.Threading.DispatcherTimer(); //Timer for background fading stars fields
+        const int y_height = 10, x1_height = -400, x2_height = 400, die_height = 220, screenWidth = 525, screenHeight = 350, fallFrequency = 2;
+        const double bkgrdTime = 0.005, second = 1;
+        double FallingSpeed = 0.5; // Words falling speed
+        int GameTime = 0;
+        delegate void Start();
+        Game game;
+        List<TextBlock> words;
+        Random r = new Random();
+        Star[] stars = new Star[400];
+        Image[] Lives = new Image[Game.Lives];
+        
         //Initialization
         public MainWindow()
         {
             InitializeComponent();
-            InitializeGame();
+            bkgrdsetup(screenWidth, screenHeight);
+            NextLevel.Visibility = Visibility.Hidden;
         }
 
-        private void InitializeGame()
+        //Setup Background
+        private void bkgrdsetup(int width, int height)
         {
-            TimeLeft = 30;
-            GameTime = 0;
-            score = 0;
-            LowerCounter = 0;
-            HigherCounter = 0;
-            LivesCount = lives;
-            Random rand = new Random();
-            for (int i = 0; i < NoOfBlock; i++)
+            for (int i = 0; i < stars.Length; i++)
             {
-                TextBlock TB = new TextBlock();
-                x_axis[i] = rand.Next(x1_height, x2_height);
-                y_axis[i] = y_height;
-                TextBlockArea.Children.Add(TB);
-                words[i] = TextBlockArea.Children[i] as TextBlock;
-                words[i].Visibility = Visibility.Hidden;
+                stars[i] = new Star(r, width, height);
+                stars[i].initialize(Canvas2D);
             }
-            for (int i = 0; i < lives; i++) { 
-                Lives[i] = LifeGrid.Children[i] as Image;
-                Lives[i].Visibility = Visibility.Visible;
+        }
+
+        //Setup Game Setting
+        private void InitializeGame(int score)
+        {
+            game = new Game(score); //Game Setup
+            Dead.Text = ""; //Health Bar
+            TypeBox.Text = ""; //Type Area
+            TimeCounter.Text = ""; //Reset Timer for Time Left
+            words = new List<TextBlock>(Game.NoOfBlock); //Reset the number of words in game 
+            for (int i = 0; i < Game.Lives; i++)
+            {
+                Lives[i] = LifeGrid.Children[i] as Image; //Health Bar Images
+                Lives[i].Visibility = Visibility.Visible; 
             }
+            Start start = new Start(Start_Game) + new Start(Start_Time) + new Start(Background_Timer); //Chain up all timer into delegate Start()
+            start();
+            TypeBox.Focus(); //Cursor on Typebox
+        }
+
+        private void StartButton_Click(object sender, RoutedEventArgs e)
+        {
+            InitializeGame(0);
+            NextLevel.Visibility = Visibility.Hidden;
+            ScoreCounter.Text = "0"; //Reset score to 0
+            ((Button)sender).Visibility = Visibility.Hidden;
+        }
+
+        private void NextLevel_Click(object sender, RoutedEventArgs e)
+        {
+            InitializeGame(game.Score);
+            if (FallingSpeed > 0.1)
+                FallingSpeed -= 0.1; //Increase difficulties
+            ((Button)sender).Visibility = Visibility.Hidden;
+            StartButton.Visibility = Visibility.Hidden;
+        }
+
+        private void Background_Timer()
+        {
+            bkgrdTimer.Tick += bkgrdTimer_Tick;
+            bkgrdTimer.Interval = TimeSpan.FromSeconds(bkgrdTime);
+            bkgrdTimer.Start();
+        }
+
+        //For every Background Time Tick, update the Background Stars Field 
+        private void bkgrdTimer_Tick(object sender, EventArgs e)
+        {
+            for (int i = 0; i < stars.Length; i++)
+                stars[i].update(Canvas2D);
         }
 
         private void Start_Time()
         {
             TimeRemaining.Visibility = Visibility.Visible;
             dispatcherTimer.Tick += dispatcherTimer_Tick;
-            dispatcherTimer.Interval = TimeSpan.FromSeconds(1);
+            dispatcherTimer.Interval = TimeSpan.FromSeconds(second);
             dispatcherTimer.Start();
         }
 
-        
-        // Every seconde past, trigger this call
+        // Every second past, check if game ends
         private void dispatcherTimer_Tick(object sender, EventArgs e)
         {
-            if (TimeLeft > 0) { 
-                TimeCounter.Text = TimeLeft-- + "s";
-            } else
-            {
-                dispatcherTimer.Tick -= dispatcherTimer_Tick;
-                dispatcherTimer.Stop();
+            if (game.TimeLeft > 0) {
+                TimeCounter.Text = game.TimeLeft-- + "s";
+            } else {
                 TimeCounter.Text = "Time's up!";
                 GameOver("Time");
             }
         }
 
-        private void GameOver(string reason) {
-            if (reason == "Time")
-                MessageBox.Show(string.Format("Time's up! Your score is: {0}", score));
-            else if (reason == "Lives")
-                    MessageBox.Show(string.Format("You have run out of lives! Your score is: {0}", score));
-            StartButton.Content = "Replay?";
-            StartButton.Visibility = Visibility.Visible;
-            gameTimer.Tick -= gameTimer_Tick;
-            dispatcherTimer.Tick -= dispatcherTimer_Tick;
-        }
-
         private void Start_Game()
         {
             gameTimer.Tick += gameTimer_Tick;
-            gameTimer.Interval = TimeSpan.FromSeconds(.1);
+            gameTimer.Interval = TimeSpan.FromSeconds(FallingSpeed);
             gameTimer.Start();
         }
 
+        //Foe every falling speed tick, trigger this call 
         private void gameTimer_Tick(object sender, EventArgs e)
         {
-            Random rand = new Random();
-            if (TimeLeft > 0)
-            {
-                if (GameTime % 4 == 0 && HigherCounter <7)
-                    HigherCounter++;
-                for (int i = LowerCounter; i < HigherCounter; i++)
-                { 
-                    words[i].Visibility = Visibility.Visible;
-                    words[i].Text = wordList[i];
-                    words[i].Margin = new Thickness(x_axis[i], y_axis[i], 0, 0);
-                    words[i].TextAlignment = TextAlignment.Center;
-                    words[i].FontSize = 12;
-                    y_axis[i] += 10;
-                    if (y_axis[i] >= die_height)
-                    {
-                        y_axis[i] = y_height;
-                        words[i].Visibility = Visibility.Hidden;
-                        LowerCounter++;
-                        Lives[--LivesCount].Visibility = Visibility.Hidden;
-                        if (LivesCount == 0)
-                            GameOver("Lives");
-                    }
-                }
-                GameTime++;
-            } else
-            {
-                gameTimer.Tick -= gameTimer_Tick;
-                gameTimer.Stop();
+            // for every N falling occur, add new falling textblock with random word
+            if (GameTime % fallFrequency == 0) {
+                int counter = words.Count;
+                words.Add(new TextBlock());
+                words[counter].TextAlignment = TextAlignment.Center;
+                words[counter].FontSize = 18;
+                words[counter].Foreground = Brushes.White;
             }
+            //Update falling words position
+            for (int i = 0; i < words.Count; i++)
+            {
+                Thickness m = words[i].Margin;
+                //New textblock setup
+                if (words[i].Text == "") { 
+                    TextBlockArea.Children.Add(words[i]);
+                    words[i].Text = Game.wordList[r.Next(Game.NoOfBlock)];
+                    m.Left = r.Next(x1_height, x2_height);
+                    m.Top = 0;
+                }
+                m.Top += y_height; // Fall y_height unit every time
+                words[i].Margin = m;
+                // Check if words drop below the die_height
+                if (game.CheckDie(words[i].Margin.Top, die_height))
+                {
+                    words[i].Visibility = Visibility.Hidden;
+                    words.Remove(words[i--]);
+                    Lives[--game.LivesCount].Visibility = Visibility.Hidden;
+                    if (game.LivesCount == 0)
+                        GameOver("Lives");
+                }
+            }
+            GameTime++; // GameTime Counter
         }
-
+        // Trigger this call when TypeBox's text is changed
         private void TypeBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             string typedWord = TypeBox.Text;
-            for (int i = LowerCounter; i < HigherCounter; i++)
+            for (int i = 0; i < words.Count; i++)
             {
-                if (wordList[i] == typedWord)
+                //Highlight the targeted word(s)
+                bool select = false;
+                for (int j = 0; j < typedWord.Length; j++){
+                    if (words[i].Text[j] == typedWord[j])
+                        select = true;
+                    else
+                    {
+                        select = false;
+                        words[i].Foreground = Brushes.White;
+                        break;
+                    }
+                }
+                if (select)
+                    words[i].Foreground = Brushes.SteelBlue;
+                //Check if any targeted word typed completely
+                if (words[i].Text == typedWord)
                 {
-                    score += 200-y_axis[i];
-                    ScoreCounter.Text = score.ToString();
-                    y_axis[i] = y_height;
+                    Thickness m = words[i].Margin;
+                    words[i].Margin = m;
+                    ScoreCounter.Text = game.GetScore(words[i].Text.Length - (int)m.Top).ToString(); //Add Score
                     words[i].Visibility = Visibility.Hidden;
-                    LowerCounter++;
-                    TypeBox.Text = "";
+                    words.Remove(words[i--]); //Remove finished word
+                    TypeBox.Text = ""; //Reset the TypeBox
                 }
             }
         }
-        
-        delegate void Start();
-
-        private void StartButton_Click(object sender, RoutedEventArgs e)
+        //When game ends, trigger this call
+        private void GameOver(string reason)
         {
-            InitializeGame();
-            ScoreCounter.Text = "0";
-            TimeCounter.Text = "";
-            ((Button)sender).Visibility = Visibility.Hidden;
-            Start start = new Start(Start_Game) + new Start(Start_Time);
-            start();
+            //stop all timers
+            gameTimer.Tick -= gameTimer_Tick;
+            gameTimer.Stop();
+            dispatcherTimer.Tick -= dispatcherTimer_Tick;
+            dispatcherTimer.Stop();
+            bkgrdTimer.Tick -= bkgrdTimer_Tick;
+            bkgrdTimer.Stop();
+            if (reason == "Time") //Reason: Time's up -> display score
+            {
+                MessageBox.Show(string.Format("Time's up! Your score is: {0}", game.Score), "Result");
+                NextLevel.Visibility = Visibility.Visible;
+            }
+            else if (reason == "Lives") //Reason: Dead-> display score
+            {
+                Dead.Text = "DEAD";
+                FallingSpeed = 0.5;
+                MessageBox.Show(string.Format("You have run out of lives! Your score is: {0}", game.Score), "Result");
+            }
+            foreach (TextBlock tb in words)
+                tb.Visibility = Visibility.Hidden;
+            StartButton.Content = "Replay?"; // Replay option
+            StartButton.Visibility = Visibility.Visible;
         }
     }
 }
